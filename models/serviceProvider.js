@@ -12,8 +12,7 @@ const geoCoordinateSchema = new mongoose.Schema({
 
 const reviewSchema = new mongoose.Schema({
     customerID: {
-        type: mongoose.Schema.Types.ObjectId, 
-        required: true
+        type: String,
     },
     rating :{
         type: Number,
@@ -87,7 +86,6 @@ const serviceProviderSchema = new mongoose.Schema({
     },
     rating: {
         type: Number,
-        required: true,
         default: 0,
         min: 0,
         max: 5
@@ -100,21 +98,18 @@ const serviceProviderSchema = new mongoose.Schema({
     reviews: [reviewSchema], 
     newSProvider: {
         type: Boolean,
-        required: true
+        default: true
     },
     info: {
         type: String,
         trim: true,
-        required: true
     },
     startingPrice: {
         type: Number,
-        required: true
     },
     subcategories: [String],
     languages: {
         type: [String],
-        default: []
     },
     joiningDate: {
         type: Date,

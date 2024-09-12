@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const { v4: uuidv4 } = require('uuid');
 
-const unverifiedEmailSchema = new mongoose.Schema(
+const unverifiedEmailSPSchema = new mongoose.Schema(
     {
         uuid: {
             type: String,
@@ -40,4 +40,4 @@ const unverifiedEmailSchema = new mongoose.Schema(
 //   }
 // });
 
-module.exports = mongoose.model("UnverifiedEmail", unverifiedEmailSchema);
+module.exports = mongoose.model("UnverifiedEmailSP", unverifiedEmailSPSchema);

@@ -6,6 +6,7 @@ const Product = require('./models/product')
 const productRoutes = require('./routes/productRoutes');
 const customerRoutes = require('./routes/customerRoutes');
 const orderRoutes = require('./routes/orderRoutes');
+const serviceProviderRoutes = require('./routes/serviceProviderRoutes');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 
@@ -49,6 +50,8 @@ const port = process.env.PORT || 8080;
 app.use('/products', productRoutes);
 
 app.use('/customers', customerRoutes);
+
+app.use('/serviceProviders', serviceProviderRoutes);
 
 app.use('/orders', orderRoutes);
 
