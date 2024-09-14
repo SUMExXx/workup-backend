@@ -7,6 +7,7 @@ const productRoutes = require('./routes/productRoutes');
 const customerRoutes = require('./routes/customerRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const serviceProviderRoutes = require('./routes/serviceProviderRoutes');
+const categoryRoutes = require('./routes/categoryRoutes');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 
@@ -52,6 +53,8 @@ app.use('/products', productRoutes);
 app.use('/customers', customerRoutes);
 
 app.use('/serviceProviders', serviceProviderRoutes);
+
+app.use('/categories', categoryRoutes);
 
 app.use('/orders', orderRoutes);
 
