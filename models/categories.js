@@ -6,7 +6,7 @@ const taskSchema = new mongoose.Schema({
         type: String,
         required: true,
         trim: true,
-        unique: true,
+        // unique: true,
         immutable: true,
         default: uuidv4
     },
@@ -28,7 +28,7 @@ const subcategorySchema = new mongoose.Schema({
         type: String,
         required: true,
         trim: true,
-        unique: true,
+        // unique: true,
         immutable: true,
         default: uuidv4
     },

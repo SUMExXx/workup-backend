@@ -23,7 +23,7 @@ module.exports.addCategory = async (req, res) => {
   try{
     await category.save().then((c) => {
 
-      res.send({message: `Category with name: ${c.name} has been created`});
+      res.send({message: `Category with name: ${c.category_name} has been created`});
 
     });
   }
@@ -76,7 +76,7 @@ module.exports.addTask = async (req, res) => {
   const price = req.body.price;
   
   const task = new Task({
-    
+    task_name: tname,
     price: price,
   })
 
