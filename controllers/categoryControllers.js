@@ -129,42 +129,41 @@ module.exports.updateCategory = async (req, res) => {
 
   var oldName;
 
-  Category.findOne({category_id: cid}).then((c) => {
+  Category.findOne({category_id: cid}).then( async (c) => {
     if (!c) {
       return res.status(404).send({ message: 'Category not found' });
     }
 
     oldName = c.category_name;
-  })
 
-  try{
-    const result = await Category.updateOne(
-      {
-        category_id: cid,
-      },
-      {
-        $set: {
-          category_name: cname 
+    try{
+      const result = await Category.updateOne(
+        {
+          category_id: cid,
+        },
+        {
+          $set: {
+            category_name: cname 
+          }
         }
+      );
+
+      if (result.matchedCount === 0) {
+        console.log('No matching category or subcategory found.');
+        return { status: 'Not Found', message: 'Category or Subcategory not found' };
       }
-    );
 
-    if (result.matchedCount === 0) {
-      console.log('No matching category or subcategory found.');
-      return { status: 'Not Found', message: 'Category or Subcategory not found' };
-    }
+      if (result.modifiedCount === 0) {
+        console.log('No document was modified.');
+        return { status: 'Not Modified', message: 'No changes were made' };
+      }
 
-    if (result.modifiedCount === 0) {
-      console.log('No document was modified.');
-      return { status: 'Not Modified', message: 'No changes were made' };
-    }
+      res.status(200).send({message: `Successfully changed category ${oldName} to new name ${cname}`});
 
-    res.status(200).send({message: `Successfully changed category ${oldName} to new name ${cname}`});
-
-  }catch(err){
-      res.json({message: err.message});
-  }  
-  
+    }catch(err){
+        res.json({message: err.message});
+    } 
+  })
 };
 
 module.exports.updateSubcategory = async (req, res) => {
@@ -176,7 +175,7 @@ module.exports.updateSubcategory = async (req, res) => {
   let oldSubcategoryName;
   let cname;
 
-  Category.findOne({ category_id: cid }).then((category) => {
+  Category.findOne({ category_id: cid }).then( async (category) => {
     if (!category) {
       return res.status(404).send({ message: 'Category not found' });
     }
@@ -190,39 +189,39 @@ module.exports.updateSubcategory = async (req, res) => {
     }
 
     oldSubcategoryName = subcategory.subcategory_name;
-  });
 
-  try {
-    
-    const result = await Category.updateOne(
-      {
-        category_id: cid,
-        'subcategories.subcategory_id': sid
-      },
-      {
-        $set: {
-          'subcategories.$.subcategory_name': newName 
+    try {
+      
+      const result = await Category.updateOne(
+        {
+          category_id: cid,
+          'subcategories.subcategory_id': sid
+        },
+        {
+          $set: {
+            'subcategories.$.subcategory_name': newName 
+          }
         }
+      );
+
+      if (result.matchedCount === 0) {
+        console.log('No matching category or subcategory found.');
+        return res.status(404).send({ message: 'Category or Subcategory not found' });
       }
-    );
 
-    if (result.matchedCount === 0) {
-      console.log('No matching category or subcategory found.');
-      return res.status(404).send({ message: 'Category or Subcategory not found' });
+      if (result.modifiedCount === 0) {
+        console.log('No document was modified.');
+        return res.status(304).send({ message: 'No changes were made' });
+      }
+
+      res.status(200).send({
+        message: `Successfully changed subcategory ${oldSubcategoryName} of category ${cname} to new subcategory name ${newName}`
+      });
+
+    } catch (err) {
+      res.status(500).json({ message: err.message });
     }
-
-    if (result.modifiedCount === 0) {
-      console.log('No document was modified.');
-      return res.status(304).send({ message: 'No changes were made' });
-    }
-
-    res.status(200).send({
-      message: `Successfully changed subcategory ${oldSubcategoryName} of category ${cname} to new subcategory name ${newName}`
-    });
-
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
+  });
 };
 
 module.exports.updateTask = async (req, res) => {
@@ -238,7 +237,7 @@ module.exports.updateTask = async (req, res) => {
   let cname;
   let sname;
 
-  Category.findOne({ category_id: cid }).then((category) => {
+  Category.findOne({ category_id: cid }).then( async (category) => {
     if (!category) {
       return res.status(404).send({ message: 'Category not found' });
     }
@@ -259,43 +258,209 @@ module.exports.updateTask = async (req, res) => {
 
     oldTaskName = task.task_name;
     oldPrice = task.price;
-  });
 
-  try {
+    try {
     
-    const result = await Category.updateOne(
-      {
-        category_id: cid,                     
-        'subcategories.subcategory_id': sid,   
-        'subcategories.tasks.task_id': tid     
-      },
-      {
-        $set: {
-          'subcategories.$[sub].tasks.$[task].task_name': newTaskName,
-          'subcategories.$[sub].tasks.$[task].price': newPrice
+      const result = await Category.updateOne(
+        {
+          category_id: cid,                     
+          'subcategories.subcategory_id': sid,   
+          'subcategories.tasks.task_id': tid     
+        },
+        {
+          $set: {
+            'subcategories.$[sub].tasks.$[task].task_name': newTaskName,
+            'subcategories.$[sub].tasks.$[task].price': newPrice
+          }
+        },
+        {
+          arrayFilters: [
+            { 'sub.subcategory_id': sid },   
+            { 'task.task_id': tid }          
+          ]
         }
-      },
-      {
-        arrayFilters: [
-          { 'sub.subcategory_id': sid },   
-          { 'task.task_id': tid }          
-        ]
+      );
+
+      if (result.matchedCount === 0) {
+        return res.status(404).send({ message: 'Category, Subcategory, or Task not found' });
       }
-    );
 
-    if (result.matchedCount === 0) {
-      return res.status(404).send({ message: 'Category, Subcategory, or Task not found' });
+      if (result.modifiedCount === 0) {
+        return res.status(304).send({ message: 'No changes were made' });
+      }
+
+      res.status(200).send({
+        message: `Successfully changed task ${oldTaskName} with price ${oldPrice} of subcategory ${sname} in category ${cname} to new task name ${newTaskName} with new price ${newPrice}`
+      });
+
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+  });
+};
+
+module.exports.getCategory = async (req, res) => {
+  const cid = req.body.category_id;
+
+  Category.findOne({ category_id: cid }).then( async (category) => {
+    if (!category) {
+      return res.status(404).send({ message: 'Category not found' });
     }
 
-    if (result.modifiedCount === 0) {
-      return res.status(304).send({ message: 'No changes were made' });
+    return res.status(200).send(category)
+  });
+}
+
+module.exports.getSubcategory = async (req, res) => {
+  const cid = req.body.category_id;
+  const sid = req.body.subcategory_id;
+
+  Category.findOne({ category_id: cid }).then( async (category) => {
+    if (!category) {
+      return res.status(404).send({ message: 'Category not found' });
     }
 
-    res.status(200).send({
-      message: `Successfully changed task ${oldTaskName} with price ${oldPrice} of subcategory ${sname} in category ${cname} to new task name ${newTaskName} with new price ${newPrice}`
-    });
+    const subcategory = category.subcategories.find(sub => sub.subcategory_id === sid);
 
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
+    return res.status(200).send(subcategory);
+  });
+}
+
+module.exports.getTask = async (req, res) => {
+  const cid = req.body.category_id;
+  const sid = req.body.subcategory_id;
+  const tid = req.body.task_id;
+
+  Category.findOne({ category_id: cid }).then( async (category) => {
+    if (!category) {
+      return res.status(404).send({ message: 'Category not found' });
+    }
+
+    const subcategory = category.subcategories.find(sub => sub.subcategory_id === sid);
+
+    const task = subcategory.tasks.find(task => task.task_id === tid);
+    return res.status(200).send(task);
+  });
+}
+
+module.exports.deleteCategory = async (req, res) => {
+
+  const cid = req.body.category_id;
+
+  var cname;
+
+  Category.findOne({category_id: cid}).then( async (c) => {
+    if (!c) {
+      return res.status(404).send({ message: 'Category not found' });
+    }
+
+    cname = c.category_name;
+
+    try{
+      const result = await Category.deleteOne(
+        {
+          category_id: cid,
+        },
+      );
+
+      if (!result.acknowledged) {
+        return res.status(400).send({ status: 'Error', message: 'Delete operation failed' });
+      }
+
+      if (result.deletedCount === 0) {
+        return res.status(404).send({ status: 'Not Found', message: 'Document not found' });
+      }
+
+      return res.status(200).send({ status: 'Success', message: `Successfully deleted category with name ${cname}` });
+
+    }catch(err){
+        res.json({message: err.message});
+    }  
+  })
+};
+
+module.exports.deleteSubcategory = async (req, res) => {
+
+  const cid = req.body.category_id;
+  const sid = req.body.subcategory_id;
+  var cname;
+  var sname;
+
+  Category.findOne({category_id: cid}).then( async (c) => {
+    if (!c) {
+      return res.status(404).send({ message: 'Category not found' });
+    }
+
+    cname = c.category_name;
+
+    const subcategoryIndex = c.subcategories.findIndex(sub => sub.subcategory_id === sid);
+    
+    if (subcategoryIndex === -1) {
+      return res.status(404).send({ message: 'Subcategory not found' });
+    }
+
+    sname = c.subcategories[subcategoryIndex].subcategory_name;
+
+    try{
+      const deletedSubcategory = c.subcategories.splice(subcategoryIndex, 1);
+
+      await c.save();
+
+      return res.status(200).send({
+        status: 'Success',
+        message: `Successfully deleted subcategory with name ${sname} of category ${cname}`,
+      });
+
+    }catch(err){
+        res.json({message: err.message});
+    }  
+  })
+};
+
+module.exports.deleteTask = async (req, res) => {
+
+  const cid = req.body.category_id;
+  const sid = req.body.subcategory_id;
+  const tid = req.body.task_id;
+  var cname;
+  var sname;
+  var tname;
+
+  Category.findOne({category_id: cid}).then( async (c) => {
+    if (!c) {
+      return res.status(404).send({ message: 'Category not found' });
+    }
+
+    cname = c.category_name;
+
+    const subcategoryIndex = c.subcategories.findIndex(sub => sub.subcategory_id === sid);
+    
+    if (subcategoryIndex === -1) {
+      return res.status(404).send({ message: 'Subcategory not found' });
+    }
+
+    sname = c.subcategories[subcategoryIndex].subcategory_name;
+
+    const taskIndex = c.subcategories[subcategoryIndex].tasks.findIndex(task => task.task_id === tid);
+
+    if (taskIndex === -1) {
+      return res.status(404).send({ message: 'Task not found' });
+    }
+
+    tname = c.subcategories[subcategoryIndex].tasks[taskIndex].task_name;
+
+    try{
+      const deletedTask = c.subcategories[subcategoryIndex].tasks.splice(taskIndex, 1);
+
+      await c.save();
+
+      return res.status(200).send({
+        status: 'Success',
+        message: `Successfully deleted task with name ${tname} of subcategory ${sname} of category ${cname}`,
+      });
+
+    }catch(err){
+        res.json({message: err.message});
+    }  
+  })
 };

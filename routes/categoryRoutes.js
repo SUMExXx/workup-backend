@@ -11,7 +11,7 @@ const nodemailer = require('nodemailer');
 const { transporter } = require('../utils/email');
 const Customer = require('../models/customer');
 const { serviceProviderLogin, serviceProviderRegister, serviceProviderVerify, serviceProviderVerifyToken } = require('../controllers/serviceProviderControllers');
-const { addCategory, addSubcategory, addTask, updateCategory, updateSubcategory, updateTask } = require('../controllers/categoryControllers');
+const { addCategory, addSubcategory, addTask, updateCategory, updateSubcategory, updateTask, deleteCategory, deleteSubcategory, deleteTask, getCategory, getSubcategory, getTask } = require('../controllers/categoryControllers');
 require('dotenv').config();
 
 cloudinary.config({
@@ -40,16 +40,16 @@ router.put('/updateSubcategory', updateSubcategory);
 
 router.put('/updateTask', updateTask);
 
-router.post('/getCategories', serviceProviderVerifyToken);
+router.get('/getCategory', getCategory);
 
-router.post('/getSubcategories', serviceProviderVerifyToken);
+router.get('/getSubcategory', getSubcategory);
 
-router.post('/getTasks', serviceProviderVerifyToken);
+router.get('/getTask', getTask);
 
-router.delete('/deleteCategory', serviceProviderVerifyToken);
+router.delete('/deleteCategory', deleteCategory);
 
-router.delete('/deleteSubcategory', serviceProviderVerifyToken);
+router.delete('/deleteSubcategory', deleteSubcategory);
 
-router.delete('/deleteTask', serviceProviderVerifyToken);
+router.delete('/deleteTask', deleteTask);
 
 module.exports = router;
