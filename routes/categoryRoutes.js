@@ -35,7 +35,7 @@ router.post('/addSubcategory', addSubcategory);
 
 router.post('/addTask', addTask);
 
-router.put('/updateCategory', updateCategory);
+router.put('/updateCategory', storage.single('image'), updateCategory);
 
 router.put('/updateSubcategory', updateSubcategory);
 

@@ -157,47 +157,84 @@ module.exports.addTask = async (req, res) => {
 };
 
 module.exports.updateCategory = async (req, res) => {
-
   const cid = req.body.category_id;
   const cname = req.body.new_name;
+  const imageUpdate = req.body.image_update;
 
-  var oldName;
-
-  Category.findOne({category_id: cid}).then( async (c) => {
-    if (!c) {
+  try {
+    const category = await Category.findOne({ category_id: cid });
+    
+    if (!category) {
       return res.status(404).send({ message: 'Category not found' });
     }
 
-    oldName = c.category_name;
+    const oldName = category.category_name;
+    const oldImgPublicId = category.image_id;
 
-    try{
-      const result = await Category.updateOne(
+    let imgPublicId = "";
+    let imgUrl = "";
+
+    if (imageUpdate === "true") {
+      // Handle image upload and deletion
+      const uploadStream = cloudinary.uploader.upload_stream(
         {
-          category_id: cid,
+          folder: 'workup/categories',
+          resource_type: 'image',
         },
-        {
-          $set: {
-            category_name: cname 
+        async (error, result) => {
+          if (error) {
+            return res.status(500).send('Error uploading image to Cloudinary');
+          }
+
+          imgPublicId = result.public_id;
+          imgUrl = cloudinary.url(imgPublicId, {
+            fetch_format: 'auto',
+            quality: 'auto',
+          });
+
+          try {
+            const deleteResult = await cloudinary.uploader.destroy(oldImgPublicId);
+
+            if (deleteResult.result !== 'ok') {
+              return res.status(404).send({ message: 'Old image not found' });
+            }
+
+            // Update the category after successfully uploading and deleting the old image
+            await updateCategoryInDb();
+          } catch (error) {
+            return res.status(500).send({ message: 'Error deleting old image', error: error.message });
           }
         }
       );
 
+      uploadStream.end(req.file.buffer);
+    } else {
+      // If no image update is required, proceed to update the category
+      await updateCategoryInDb();
+    }
+
+    async function updateCategoryInDb() {
+      const result = await Category.updateOne(
+        { category_id: cid },
+        { $set: { category_name: cname, image_url: imgUrl || category.image_url, image_id: imgPublicId || oldImgPublicId } }
+      );
+
       if (result.matchedCount === 0) {
         console.log('No matching category or subcategory found.');
-        return { status: 'Not Found', message: 'Category or Subcategory not found' };
+        return res.status(404).send({ status: 'Not Found', message: 'Category or Subcategory not found' });
       }
 
       if (result.modifiedCount === 0) {
         console.log('No document was modified.');
-        return { status: 'Not Modified', message: 'No changes were made' };
+        return res.status(304).send({ status: 'Not Modified', message: 'No changes were made' });
       }
 
-      res.status(200).send({message: `Successfully changed category ${oldName} to new name ${cname}`});
+      res.status(200).send({ message: `Successfully changed category ${oldName} to new name ${cname}` });
+    }
 
-    }catch(err){
-        res.json({message: err.message});
-    } 
-  })
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 };
 
 module.exports.updateSubcategory = async (req, res) => {
