@@ -10,6 +10,7 @@ const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const { transporter } = require('../utils/email');
 const Customer = require('../models/customer');
+const { storage } = require('../storage');
 const { serviceProviderLogin, serviceProviderRegister, serviceProviderVerify, serviceProviderVerifyToken } = require('../controllers/serviceProviderControllers');
 const { addCategory, addSubcategory, addTask, updateCategory, updateSubcategory, updateTask, deleteCategory, deleteSubcategory, deleteTask, getCategory, getSubcategory, getTask } = require('../controllers/categoryControllers');
 require('dotenv').config();
@@ -28,7 +29,7 @@ const upload = multer({ storage: multer.memoryStorage() });
   message: String
 */
 
-router.post('/addCategory', addCategory);
+router.post('/addCategory', storage.single('image'), addCategory);
 
 router.post('/addSubcategory', addSubcategory);
 

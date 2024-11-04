@@ -107,6 +107,10 @@ const serviceProviderSchema = new mongoose.Schema({
     startingPrice: {
         type: Number,
     },
+    category: {
+        type: String,
+        trim: true,
+    },
     subcategories: [String],
     languages: {
         type: [String],
