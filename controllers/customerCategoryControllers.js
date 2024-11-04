@@ -333,15 +333,14 @@ module.exports.updateTask = async (req, res) => {
   });
 };
 
-module.exports.getCategory = async (req, res) => {
-  const cid = req.body.category_id;
+module.exports.getCategories = async (req, res) => {
 
-  Category.findOne({ category_id: cid }).then( async (category) => {
-    if (!category) {
-      return res.status(404).send({ message: 'Category not found' });
+  Category.find({}, "category_name image_url").then( async (categories) => {
+    if (!categories) {
+      return res.status(404).send({ message: 'Categories not found' });
     }
 
-    return res.status(200).send(category)
+    return res.status(200).send(categories)
   });
 }
 

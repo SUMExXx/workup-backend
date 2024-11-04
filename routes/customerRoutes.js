@@ -11,6 +11,7 @@ const nodemailer = require('nodemailer');
 const { transporter } = require('../utils/email');
 const Customer = require('../models/customer');
 const { customerRegister, customerVerify, customerLogin, customerVerifyToken } = require('../controllers/customerControllers');
+const { getCategories } = require('../controllers/customerCategoryControllers');
 require('dotenv').config();
 
 cloudinary.config({
@@ -34,6 +35,8 @@ router.post('/verify', customerVerify);
 router.post('/login', customerLogin);
 
 router.post('/verifyToken', customerVerifyToken);
+
+router.get('/getCategories', getCategories);
 
 router.post('/googleLogin', upload.single('image'), async (req, res) => {
 
