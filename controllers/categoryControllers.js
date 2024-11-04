@@ -42,7 +42,8 @@ module.exports.addCategory = async (req, res) => {
         
         const category = new Category({
           category_name: name,
-          image_url: optimizedUrl
+          image_url: optimizedUrl,
+          image_id: imgPublicId
         })
 
         try{
