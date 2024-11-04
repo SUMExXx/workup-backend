@@ -59,6 +59,11 @@ const categorySchema = new mongoose.Schema(
             required: true,
             trim: true,
         },
+        image_id: {
+            type: String,
+            required: true,
+            trim: true,
+        },
         subcategories: [subcategorySchema],
     } 
 );
