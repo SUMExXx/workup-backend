@@ -147,3 +147,35 @@ module.exports.serviceProviderVerifyToken = async (req, res) => {
     res.status(500).json({ message: 'Server error', error, code: "Error" });
   }
 };
+
+module.exports.serviceProviderUpdateDetails = async (req, res) => {
+  const { email, firstName, middleName, lastName, phoneNumber, info } = req.body;
+
+  try {
+    const serviceProvider = await ServiceProvider.findOne({ email: email });
+    if (!serviceProvider) {
+      return res.status(400).json({ message: 'Invalid Email', code: 'InvalidEmail' });
+    }
+
+    if (firstName) serviceProvider.firstName = firstName;
+    if (middleName) serviceProvider.middleName = middleName;
+    if (lastName) serviceProvider.lastName = lastName;
+    if (phoneNumber) serviceProvider.phoneNumber = phoneNumber;
+    if (info) serviceProvider.info = info;
+
+    const saved = await serviceProvider.save();
+
+    if(saved){
+      res.status(200).send({
+        message: `Service provider with email: ${email} has been updated`
+      })
+    } else {
+      res.status(500).send({
+        message: `Error occured`
+      })
+    }
+
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error, code: "Error" });
+  }
+};

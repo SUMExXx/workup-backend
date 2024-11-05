@@ -106,6 +106,7 @@ const serviceProviderSchema = new mongoose.Schema({
     },
     startingPrice: {
         type: Number,
+        default: 0
     },
     category: {
         type: String,
