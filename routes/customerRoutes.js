@@ -10,7 +10,7 @@ const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const { transporter } = require('../utils/email');
 const Customer = require('../models/customer');
-const { customerRegister, customerVerify, customerLogin, customerVerifyToken, getCategories, getServiceProviders, getCustomerDetails } = require('../controllers/customerControllers');
+const { customerRegister, customerVerify, customerLogin, customerVerifyToken, getCategories, getServiceProviders, getCustomerDetails, updateCustomerDetails } = require('../controllers/customerControllers');
 require('dotenv').config();
 
 cloudinary.config({
@@ -40,6 +40,8 @@ router.get('/getCategories', getCategories);
 router.post('/getServiceProviders', getServiceProviders);
 
 router.post('/getCustomerDetails', getCustomerDetails);
+
+router.put('/updateCustomerDetails', updateCustomerDetails);
 
 router.post('/googleLogin', upload.single('image'), async (req, res) => {
 

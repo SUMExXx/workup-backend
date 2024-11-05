@@ -187,3 +187,27 @@ module.exports.getCustomerDetails = async (req, res) => {
 
   res.status(200).send(customer)
 }
+
+module.exports.updateCustomerDetails = async (req, res) => {
+
+  const { email, firstName, middleName, lastName, phoneNumber, religion, addressLine1, addressLine2, city, state, zipCode } = req.body;
+
+  const customer = await Customer.findOneAndUpdate({ email: email}, { $set: { 
+    firstName: firstName,
+    middleName: middleName,
+    lastName: lastName,
+    phoneNumber: phoneNumber,
+    religion: religion,
+    addressLine1: addressLine1,
+    addressLine2: addressLine2,
+    city: city,
+    state: state,
+    zipCode: zipCode
+  } },);
+
+  if(!customer){
+    return res.status(400).send({message: "No Customer found"});
+  }
+
+  res.status(200).send({message: "Customer Updated"})
+}
