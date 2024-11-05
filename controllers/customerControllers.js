@@ -161,6 +161,20 @@ module.exports.getCategories = async (req, res) => {
   });
 }
 
+module.exports.getSubcategories = async (req, res) => {
+  const category_id = req.body.category_id
+
+  const category = await Category.findOne({ category_id: category_id}, "subcategories");
+
+  if(!category){
+    return res.status(400).send({message: "No subcategories found"});
+  }
+
+  const newArray = category.subcategories.map(({ subcategory_id, subcategory_name }) => ({ subcategory_id, subcategory_name }));
+
+  res.status(200).send(newArray)
+}
+
 module.exports.getServiceProviders = async (req, res) => {
 
   const category = req.body.category;
@@ -192,18 +206,20 @@ module.exports.updateCustomerDetails = async (req, res) => {
 
   const { email, firstName, middleName, lastName, phoneNumber, religion, addressLine1, addressLine2, city, state, zipCode } = req.body;
 
-  const customer = await Customer.findOneAndUpdate({ email: email}, { $set: { 
-    firstName: firstName,
-    middleName: middleName,
-    lastName: lastName,
-    phoneNumber: phoneNumber,
-    religion: religion,
-    addressLine1: addressLine1,
-    addressLine2: addressLine2,
-    city: city,
-    state: state,
-    zipCode: zipCode
-  } },);
+  const updateFields = {};
+
+  if (firstName != null) updateFields.firstName = firstName;
+  if (middleName != null) updateFields.middleName = middleName;
+  if (lastName != null) updateFields.lastName = lastName;
+  if (phoneNumber != null) updateFields.phoneNumber = phoneNumber;
+  if (religion != null) updateFields.religion = religion;
+  if (addressLine1 != null) updateFields.addressLine1 = addressLine1;
+  if (addressLine2 != null) updateFields.addressLine2 = addressLine2;
+  if (city != null) updateFields.city = city;
+  if (state != null) updateFields.state = state;
+  if (zipCode != null) updateFields.zipCode = zipCode;
+
+  const customer = await Customer.findOneAndUpdate({ email: email}, { $set: updateFields },);
 
   if(!customer){
     return res.status(400).send({message: "No Customer found"});
