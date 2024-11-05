@@ -174,3 +174,16 @@ module.exports.getServiceProviders = async (req, res) => {
 
   res.status(200).send(serviceProvider)
 }
+
+module.exports.getCustomerDetails = async (req, res) => {
+
+  const email = req.body.email;
+
+  const customer = await Customer.findOne({ email: email}, "uuid firstName middleName lastName imgURL phoneNumber religion addressLine1 addressLine2 city state zipCode");
+
+  if(!customer){
+    return res.status(400).send({message: "No service providers found"});
+  }
+
+  res.status(200).send(customer)
+}
