@@ -5,11 +5,13 @@ const UnverifiedEmail = require('../models/unverifiedEmail');
 const bcrypt = require('bcrypt');
 const multer = require('multer');
 const Order = require('../models/order');
+const {Category, Subcategory, Task} = require('../models/categories');
 const cloudinary = require('cloudinary').v2;
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const { transporter } = require('../utils/email');
 const Customer = require('../models/customer');
+const ServiceProvider = require('../models/serviceProvider');
 require('dotenv').config();
 
 module.exports.customerRegister = async (req, res) => {
@@ -147,3 +149,28 @@ module.exports.customerVerifyToken = async (req, res) => {
     res.status(500).json({ message: 'Server error', error, code: "Error" });
   }
 };
+
+module.exports.getCategories = async (req, res) => {
+
+  Category.find({}, "category_name image_url category_id").then( async (categories) => {
+    if (!categories) {
+      return res.status(404).send({ message: 'Categories not found' });
+    }
+
+    return res.status(200).send(categories)
+  });
+}
+
+module.exports.getServiceProviders = async (req, res) => {
+
+  const category = req.body.category;
+  const email = req.body.email;
+
+  const serviceProvider = await ServiceProvider.find({ category: category}, "uuid firstName middleName lastName imgURL rating reviewCount newSProvider info startingPrice");
+
+  if(!serviceProvider){
+    return res.status(400).send({message: "No service providers found"});
+  }
+
+  res.status(200).send(serviceProvider)
+}
