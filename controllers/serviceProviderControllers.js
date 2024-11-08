@@ -179,3 +179,16 @@ module.exports.serviceProviderUpdateDetails = async (req, res) => {
     res.status(500).json({ message: 'Server error', error, code: "Error" });
   }
 };
+
+module.exports.getServiceProviderDetails = async (req, res) => {
+
+  const email = req.body.email;
+
+  const serviceProvider = await ServiceProvider.findOne({ email: email}, "uuid firstName middleName lastName imgUrl newSProvider phoneNumber rating reviewCount");
+
+  if(!serviceProvider){
+    return res.status(400).send({message: "No service providers found"});
+  }
+
+  res.status(200).send(serviceProvider)
+}

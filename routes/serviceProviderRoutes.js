@@ -10,7 +10,7 @@ const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const { transporter } = require('../utils/email');
 const Customer = require('../models/customer');
-const { serviceProviderLogin, serviceProviderRegister, serviceProviderVerify, serviceProviderVerifyToken, serviceProviderUpdateDetails } = require('../controllers/serviceProviderControllers');
+const { serviceProviderLogin, serviceProviderRegister, serviceProviderVerify, serviceProviderVerifyToken, serviceProviderUpdateDetails, getServiceProviderDetails } = require('../controllers/serviceProviderControllers');
 require('dotenv').config();
 
 cloudinary.config({
@@ -36,5 +36,7 @@ router.post('/loginSP', serviceProviderLogin);
 router.post('/verifyTokenSP', serviceProviderVerifyToken);
 
 router.put('/updateDetailsSP', serviceProviderUpdateDetails);
+
+router.post('/getServiceProviderDetails', getServiceProviderDetails);
 
 module.exports = router;
