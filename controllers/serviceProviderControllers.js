@@ -184,7 +184,7 @@ module.exports.getServiceProviderDetails = async (req, res) => {
 
   const email = req.body.email;
 
-  const serviceProvider = await ServiceProvider.findOne({ email: email}, "uuid firstName middleName lastName imgUrl newSProvider phoneNumber rating reviewCount");
+  const serviceProvider = await ServiceProvider.findOne({ email: email}, "uuid firstName middleName lastName imgURL newSProvider phoneNumber rating reviewCount");
 
   if(!serviceProvider){
     return res.status(400).send({message: "No service providers found"});
