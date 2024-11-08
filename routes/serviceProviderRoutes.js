@@ -37,4 +37,6 @@ router.post('/verifyTokenSP', serviceProviderVerifyToken);
 
 router.put('/updateDetailsSP', serviceProviderUpdateDetails);
 
+router.post('/getServiceProviderDetails', getCustomerDetails);
+
 module.exports = router;

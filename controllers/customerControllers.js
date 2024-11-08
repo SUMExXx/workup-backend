@@ -196,7 +196,7 @@ module.exports.getCustomerDetails = async (req, res) => {
   const customer = await Customer.findOne({ email: email}, "uuid firstName middleName lastName imgUrl phoneNumber religion addressLine1 addressLine2 city state zipCode");
 
   if(!customer){
-    return res.status(400).send({message: "No service providers found"});
+    return res.status(400).send({message: "No customers found"});
   }
 
   res.status(200).send(customer)
