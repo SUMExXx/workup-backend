@@ -4,7 +4,7 @@ const Product = require('../models/product');
 const UnverifiedEmail = require('../models/unverifiedEmail');
 const bcrypt = require('bcrypt');
 const multer = require('multer');
-const Order = require('../models/order');
+const Order = require('../models/unverifiedOrder');
 const {Category, Subcategory, Task} = require('../models/categories');
 const cloudinary = require('cloudinary').v2;
 const jwt = require('jsonwebtoken');
@@ -220,6 +220,17 @@ module.exports.updateCustomerDetails = async (req, res) => {
   if (zipCode != null) updateFields.zipCode = zipCode;
 
   const customer = await Customer.findOneAndUpdate({ email: email}, { $set: updateFields },);
+
+  if(!customer){
+    return res.status(400).send({message: "No Customer found"});
+  }
+
+  res.status(200).send({message: "Customer Updated"})
+}
+
+module.exports.placeOrder = async (req, res) => {
+
+  const { email, firstName, middleName, lastName, phoneNumber, religion, addressLine1, addressLine2, city, state, zipCode } = req.body;
 
   if(!customer){
     return res.status(400).send({message: "No Customer found"});

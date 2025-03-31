@@ -4,13 +4,13 @@ const Product = require('../models/product');
 const UnverifiedEmail = require('../models/unverifiedEmail');
 const bcrypt = require('bcrypt');
 const multer = require('multer');
-const Order = require('../models/order');
+const UnverifiedOrder = require('../models/unverifiedOrder');
 const cloudinary = require('cloudinary').v2;
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const { transporter } = require('../utils/email');
 const Customer = require('../models/customer');
-const { customerRegister, customerVerify, customerLogin, customerVerifyToken, getCategories, getServiceProviders, getCustomerDetails, updateCustomerDetails, getSubcategories } = require('../controllers/customerControllers');
+const { customerRegister, customerVerify, customerLogin, customerVerifyToken, getCategories, getServiceProviders, getCustomerDetails, updateCustomerDetails, getSubcategories, placeOrder } = require('../controllers/customerControllers');
 require('dotenv').config();
 
 cloudinary.config({
@@ -44,6 +44,8 @@ router.post('/getServiceProviders', getServiceProviders);
 router.post('/getCustomerDetails', getCustomerDetails);
 
 router.put('/updateCustomerDetails', updateCustomerDetails);
+
+router.post('/placeOrder', placeOrder);
 
 router.post('/googleLogin', upload.single('image'), async (req, res) => {
 
@@ -347,13 +349,13 @@ router.post('/placeOrder', async (req, res) => {
 
   await User.findOne({ uuid: id }).then( async (user) => {
     
-    const order = new Order({
+    const unverifiedOrder = new UnverifiedOrder({
       items: user.cart.items,
       uuid: id,
     })
   
     try{
-      await order.save().then( async () => {
+      await unverifiedOrder.save().then( async () => {
         user.cart.items = []
         await user.save().then(() => {
           res.status(200).json({message: 'Order placed'})
