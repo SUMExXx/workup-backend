@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
 const { v4: uuidv4 } = require('uuid');
 
-const cartItemSchema = new mongoose.Schema({
-    id: {
+const taskItemSchema = new mongoose.Schema({
+    taskId: {
         type: String,
     },
     qty: {
@@ -12,17 +12,23 @@ const cartItemSchema = new mongoose.Schema({
     }
 });
 
+const subcategoryItemSchema = new mongoose.Schema({
+    subcategoryId: {
+        type: String,
+    },
+    tasks: [taskItemSchema]
+});
+
 const unverifiedOrderSchema = new mongoose.Schema(
     {
         orderId: {
             type: String,
-            required: true,
             trim: true,
             unique: true,
             immutable: true,
             default: uuidv4
         },
-        uuid: {
+        sid: {
             type: String,
             required: true,
             trim: true,
@@ -30,12 +36,11 @@ const unverifiedOrderSchema = new mongoose.Schema(
         },
         dateTime: {
             type: Date,
-            required: true,
             unique: true,
             immutable: true,
             default: Date.now
         },
-        items: [cartItemSchema]
+        items: [subcategoryItemSchema]
     } 
 );
 
@@ -52,4 +57,4 @@ const unverifiedOrderSchema = new mongoose.Schema(
 //   }
 // });
 
-module.exports = mongoose.model("unverifiedOrder", unverifiedOrderSchema);
+module.exports = mongoose.model("UnverifiedOrder", unverifiedOrderSchema);

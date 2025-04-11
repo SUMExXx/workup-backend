@@ -4,7 +4,6 @@ const Product = require('../models/product');
 const UnverifiedEmail = require('../models/unverifiedEmail');
 const bcrypt = require('bcrypt');
 const multer = require('multer');
-const Order = require('../models/unverifiedOrder');
 const {Category, Subcategory, Task} = require('../models/categories');
 const cloudinary = require('cloudinary').v2;
 const jwt = require('jsonwebtoken');
@@ -12,6 +11,7 @@ const nodemailer = require('nodemailer');
 const { transporter } = require('../utils/email');
 const Customer = require('../models/customer');
 const ServiceProvider = require('../models/serviceProvider');
+const UnverifiedOrder = require('../models/unverifiedOrder');
 require('dotenv').config();
 
 module.exports.customerRegister = async (req, res) => {
@@ -228,13 +228,87 @@ module.exports.updateCustomerDetails = async (req, res) => {
   res.status(200).send({message: "Customer Updated"})
 }
 
-module.exports.placeOrder = async (req, res) => {
+module.exports.getServiceProviderData = async (req, res) => {
 
-  const { email, firstName, middleName, lastName, phoneNumber, religion, addressLine1, addressLine2, city, state, zipCode } = req.body;
+  const { sID } = req.body;
 
-  if(!customer){
-    return res.status(400).send({message: "No Customer found"});
+  const sp = await ServiceProvider.findOne({ uuid: sID }, {
+    imgURL: 1,
+    firstName: 1,
+    middleName: 1,
+    lastName: 1,
+    newSProvider: 1,
+    sName: 1,
+    rating: 1,
+    reviewCount: 1,
+    uuid: 1,
+    info: 1,
+    startingPrice: 1,
+    category: 1,
+
+  },);
+
+  if (!sp) {
+    return res.status(400).send({ message: "No Customer found" });
   }
 
-  res.status(200).send({message: "Customer Updated"})
+  const category = await Category.findOne({ category_id: sp.category }, "category_name");
+
+  const data = {
+    imgURL: sp.imgURL,
+    sName: sp.firstName + " " + sp.middleName + " " + sp.lastName,
+    rating: sp.rating,
+    reviews: sp.reviewCount,
+    sID: sp.uuid,
+    info: sp.info,
+    startingPrice: sp.startingPrice,
+    category_id: sp.category,
+    category: category.category_name,
+    away: 1,
+    saved: false,
+    ordersCompleted: 50,
+    newSProvider: sp.newSProvider
+  }
+
+  res.status(200).send(data)
+}
+
+module.exports.getServiceProviderSubcategories = async (req, res) => {
+
+  const { sID } = req.body;
+
+  const sp = await ServiceProvider.findOne({ uuid: sID }, {
+    category: 1,
+  },);
+
+  if (!sp) {
+    return res.status(400).send({ message: "No Customer found" });
+  }
+
+  const subcategories = await Category.findOne({ category_id: sp.category }, "subcategories");
+
+  res.status(200).send(subcategories.subcategories)
+}
+
+module.exports.placeOrder = async (req, res) => {
+
+  const data = req.body;
+
+  if(data.sp == null || data.data == null || data.data.isEmpty){
+    return res.status(400).send({message: "Invalid data"});
+  }
+
+  const order = new UnverifiedOrder(
+    {
+      sid: data.sp,
+      items: data.data
+    }
+  )
+
+  const savedOrder = await order.save();
+  if(!savedOrder){
+    return res.status(400).send({message: "Order not placed"});
+  }
+
+  res.status(200).send({message: "OrderPlaced"})
 }
