@@ -62,28 +62,28 @@ module.exports.serviceProviderVerify  = async (req, res) => {
 
   const email = req.body.email;
   const otp = req.body.otp;
-  
+
 
   try{
       await UnverifiedEmailSP.findOne({email: email}).then( async (uvemailSP) =>{
-        
+
         if(uvemailSP.otp == otp){
-          
+
           const serviceProvider = new ServiceProvider(
             {
               email: uvemailSP.email,
               password: uvemailSP.password,
             }
           )
-          
+
           try{
             await serviceProvider.save().then(async () => {
-              
+
               try{
                 await UnverifiedEmailSP.deleteOne({ _id: uvemailSP._id }).then(() => {
                   res.status(200).send({message: "Verification successful"});
                 });
-                
+
               } catch (err) {
                 res.status(400).json({message: err.message});
               }
@@ -98,8 +98,8 @@ module.exports.serviceProviderVerify  = async (req, res) => {
 
   }catch(err){
       res.json({message: err.message});
-  }  
-  
+  }
+
 };
 
 module.exports.serviceProviderLogin = async (req, res) => {
@@ -116,7 +116,7 @@ module.exports.serviceProviderLogin = async (req, res) => {
     if (!isMatch) {
       return res.status(400).json({ message: 'Invalid Password', code: 'InvalidCode' });
     }
-    
+
     const token = jwt.sign({ userId: serviceProvider._id }, process.env.JWT_SECRET, { expiresIn: '30d' });
 
     res.json({ token, code: "Success" });
