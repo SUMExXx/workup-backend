@@ -4,7 +4,6 @@ const Product = require('../models/product');
 const UnverifiedEmailSP = require('../models/unverifiedEmailSP');
 const bcrypt = require('bcrypt');
 const multer = require('multer');
-const Order = require('../models/order');
 const cloudinary = require('cloudinary').v2;
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');

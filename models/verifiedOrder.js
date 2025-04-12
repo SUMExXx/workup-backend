@@ -12,7 +12,7 @@ const cartItemSchema = new mongoose.Schema({
     }
 });
 
-const orderSchema = new mongoose.Schema(
+const unverifiedOrderSchema = new mongoose.Schema(
     {
         orderId: {
             type: String,
@@ -52,4 +52,4 @@ const orderSchema = new mongoose.Schema(
 //   }
 // });
 
-module.exports = mongoose.model("Order", orderSchema);
+module.exports = mongoose.model("unverifiedOrder", unverifiedOrderSchema);
