@@ -34,6 +34,17 @@ const unverifiedOrderSchema = new mongoose.Schema(
             trim: true,
             immutable: true
         },
+        email: {
+            type: String,
+            required: true,
+            trim: true,
+            immutable: true
+        },
+        status: {
+            type: String,
+            enum: ['pending', 'completed', 'cancelled'],
+            default: 'pending'
+        },
         dateTime: {
             type: Date,
             unique: true,
