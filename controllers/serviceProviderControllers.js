@@ -210,3 +210,39 @@ module.exports.getPendingOrders = async (req, res) => {
 
   res.status(200).send(pendingOrders)
 }
+
+module.exports.getCompletedOrders = async (req, res) => {
+
+  const email = req.body.email;
+
+  const serviceProvider = await ServiceProvider.findOne({ email: email}, "uuid firstName middleName lastName imgURL newSProvider phoneNumber rating reviewCount");
+
+  if(!serviceProvider){
+    return res.status(400).send({message: "No service providers found"});
+  }
+
+  const pendingOrders = await unverifiedOrder.find({sid: serviceProvider.uuid, status: "completed"}, "orderId sid email status dateTime items");
+  if(!pendingOrders){
+    return res.status(400).send({message: "No pending orders found"});
+  }
+
+  res.status(200).send(pendingOrders)
+}
+
+module.exports.getCancelledOrders = async (req, res) => {
+
+  const email = req.body.email;
+
+  const serviceProvider = await ServiceProvider.findOne({ email: email}, "uuid firstName middleName lastName imgURL newSProvider phoneNumber rating reviewCount");
+
+  if(!serviceProvider){
+    return res.status(400).send({message: "No service providers found"});
+  }
+
+  const pendingOrders = await unverifiedOrder.find({sid: serviceProvider.uuid, status: "cancelled"}, "orderId sid email status dateTime items");
+  if(!pendingOrders){
+    return res.status(400).send({message: "No pending orders found"});
+  }
+
+  res.status(200).send(pendingOrders)
+}
