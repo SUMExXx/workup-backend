@@ -10,6 +10,7 @@ const serviceProviderRoutes = require('./routes/serviceProviderRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
+const reviewRoutes = require('./routes/reviewRoutes');
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -57,7 +58,8 @@ app.use('/serviceProviders', serviceProviderRoutes);
 app.use('/categories', categoryRoutes);
 
 app.use('/orders', orderRoutes);
+app.use('/api', reviewRoutes);
 
-app.listen(port, () => {
+app.listen(port, '0.0.0.0', () => {
   console.log(`Server is running on port ${port}`);
 });
