@@ -300,15 +300,14 @@ module.exports.placeOrder = async (req, res) => {
 
   const data = req.body;
 
-  if(data.sp == null || data.data == null || data.email == null || data.data.isEmpty){
+  if(data.sp == null || data.data == null || data.data.isEmpty){
     return res.status(400).send({message: "Invalid data"});
   }
 
   const order = new UnverifiedOrder(
     {
       sid: data.sp,
-      items: data.data,
-      email: data.email,
+      items: data.data
     }
   )
 
